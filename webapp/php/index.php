@@ -378,7 +378,7 @@ $app->post('/', function (Request $request, Response $response) {
 });
 
 $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $args) {
-    $satat_time = time();
+    $start_time = time();
 
     if ($args['id'] == 0) {
         return '';
@@ -396,7 +396,7 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
     $end_time = time();
     $diff_time = $end_time - $start_time;
     $log_str = '[GET image] [' . $args['id'] . '] 処理時間: ' . $diff_time . 's\n';
-    file_put_contents(LOG_DIRECTORY . '/image.log' , $log_str);
+    file_put_contents('./image.log' , $log_str,  FILE_APPEND | LOCK_EX);
 
     return $response->withStatus(404)->write('404');
 });
