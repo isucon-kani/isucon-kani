@@ -378,6 +378,7 @@ $app->post('/', function (Request $request, Response $response) {
 });
 
 $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $args) {
+    // bigen::開始時刻
     $start_time = microtime();
 
     if ($args['id'] == 0) {
@@ -389,14 +390,15 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
     if (($args['ext'] == 'jpg' && $post['mime'] == 'image/jpeg') ||
         ($args['ext'] == 'png' && $post['mime'] == 'image/png') ||
         ($args['ext'] == 'gif' && $post['mime'] == 'image/gif')) {
+
+        // bigen:: 差分時間
         $time = microtime() - $start_time;
-        file_put_contents('./image.log' , $time . "\n",  FILE_APPEND | LOCK_EX);
+        // bigen:: ログ出力
+        file_put_contents('./image.log' , "[image] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+
         return $response->withHeader('Content-Type', $post['mime'])
                         ->write($post['imgdata']);
     }
-
-    $time = microtime() - $start_time;
-    file_put_contents('./image.log' , $time . "\n",  FILE_APPEND | LOCK_EX);
     return $response->withStatus(404)->write('404');
 });
 
