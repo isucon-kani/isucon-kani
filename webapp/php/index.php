@@ -206,21 +206,56 @@ function calculate_passhash($account_name, $password) {
 // --------
 
 $app->get('/initialize', function (Request $request, Response $response) {
+    // sumomo::開始時刻
+    $start_time = microtime();
+    
     $this->get('helper')->db_initialize();
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./initialize.log' , "[initialize] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return $response;
 });
 
 $app->get('/login', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     if ($this->get('helper')->get_session_user() !== null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./login.log' , "[login] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/', 302);
     }
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./login.log' , "[login] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return $this->view->render($response, 'login.php', [
         'me' => null
     ]);
 });
 
 $app->post('/login', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();
+    
     if ($this->get('helper')->get_session_user() !== null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./login.log' , "[login] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/', 302);
     }
 
@@ -232,17 +267,45 @@ $app->post('/login', function (Request $request, Response $response) {
         $_SESSION['user'] = [
           'id' => $user['id'],
         ];
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./login.log' , "[login] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/', 302);
     } else {
         $this->flash->addMessage('notice', 'アカウント名かパスワードが間違っています');
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./login.log' , "[login] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/login', 302);
     }
 });
 
 $app->get('/register', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     if ($this->get('helper')->get_session_user() !== null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);        
+        
         return redirect($response, '/', 302);
     }
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return $this->view->render($response, 'register.php', [
         'me' => null
     ]);
@@ -250,7 +313,17 @@ $app->get('/register', function (Request $request, Response $response) {
 
 
 $app->post('/register', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     if ($this->get('helper')->get_session_user()) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/', 302);
     }
 
@@ -261,12 +334,24 @@ $app->post('/register', function (Request $request, Response $response) {
     $validated = validate_user($account_name, $password);
     if (!$validated) {
         $this->flash->addMessage('notice', 'アカウント名は3文字以上、パスワードは6文字以上である必要があります');
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/register', 302);
     }
 
     $user = $this->get('helper')->fetch_first('SELECT 1 FROM users WHERE `account_name` = ?', $account_name);
     if ($user) {
         $this->flash->addMessage('notice', 'アカウント名がすでに使われています');
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/register', 302);
     }
 
@@ -279,15 +364,35 @@ $app->post('/register', function (Request $request, Response $response) {
     $_SESSION['user'] = [
         'id' => $db->lastInsertId(),
     ];
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./register.log' , "[register] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return redirect($response, '/', 302);
 });
 
 $app->get('/logout', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     unset($_SESSION['user']);
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./logout.log' , "[logout] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return redirect($response, '/', 302);
 });
 
 $app->get('/', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     $me = $this->get('helper')->get_session_user();
 
     $db = $this->get('db');
@@ -295,11 +400,20 @@ $app->get('/', function (Request $request, Response $response) {
     $ps->execute();
     $results = $ps->fetchAll(PDO::FETCH_ASSOC);
     $posts = $this->get('helper')->make_posts($results);
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./get.log' , "[get] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return $this->view->render($response, 'index.php', ['posts' => $posts, 'me' => $me]);
 });
 
 $app->get('/posts', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();
+    
     $params = $request->getParams();
     $max_created_at = $params['max_created_at'] ?? null;
     $db = $this->get('db');
@@ -308,10 +422,19 @@ $app->get('/posts', function (Request $request, Response $response) {
     $results = $ps->fetchAll(PDO::FETCH_ASSOC);
     $posts = $this->get('helper')->make_posts($results);
 
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./posts.log' , "[posts] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+
     return $this->view->render($response, 'posts.php', ['posts' => $posts]);
 });
 
 $app->get('/posts/{id}', function (Request $request, Response $response, $args) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     $db = $this->get('db');
     $ps = $db->prepare('SELECT * FROM `posts` WHERE `id` = ?');
     $ps->execute([$args['id']]);
@@ -325,19 +448,40 @@ $app->get('/posts/{id}', function (Request $request, Response $response, $args) 
     $post = $posts[0];
 
     $me = $this->get('helper')->get_session_user();
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./posts.log' , "[posts] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return $this->view->render($response, 'post.php', ['post' => $post, 'me' => $me]);
 });
 
 $app->post('/', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();
+    
     $me = $this->get('helper')->get_session_user();
 
     if ($me === null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/login', 302);
     }
 
     $params = $request->getParams();
     if ($params['csrf_token'] !== session_id()) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(422)->write('422');
     }
 
@@ -352,11 +496,23 @@ $app->post('/', function (Request $request, Response $response) {
             $mime = 'image/gif';
         } else {
             $this->flash->addMessage('notice', '投稿できる画像形式はjpgとpngとgifだけです');
+            
+            // sumomo:: 差分時間
+            $time = microtime() - $start_time;
+            // sumomo:: ログ出力
+            file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+            
             return redirect($response, '/', 302);
         }
 
         if (strlen(file_get_contents($_FILES['file']['tmp_name'])) > UPLOAD_LIMIT) {
             $this->flash->addMessage('notice', 'ファイルサイズが大きすぎます');
+            
+            // sumomo:: 差分時間
+            $time = microtime() - $start_time;
+            // sumomo:: ログ出力
+            file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+            
             return redirect($response, '/', 302);
         }
 
@@ -370,9 +526,21 @@ $app->post('/', function (Request $request, Response $response) {
           $params['body'],
         ]);
         $pid = $db->lastInsertId();
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, "/posts/{$pid}", 302);
     } else {
         $this->flash->addMessage('notice', '画像が必須です');
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./post.log' , "[post] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/', 302);
     }
 });
@@ -382,6 +550,12 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
     $start_time = microtime();
 
     if ($args['id'] == 0) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./image.log' , "[image] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return '';
     }
 
@@ -399,23 +573,51 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
         return $response->withHeader('Content-Type', $post['mime'])
                         ->write($post['imgdata']);
     }
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./image.log' , "[image] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+    
     return $response->withStatus(404)->write('404');
 });
 
 $app->post('/comment', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     $me = $this->get('helper')->get_session_user();
 
     if ($me === null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./comment.log' , "[comment] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/login', 302);
     }
 
     $params = $request->getParams();
     if ($params['csrf_token'] !== session_id()) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./comment.log' , "[comment] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(422)->write('422');
     }
 
     // TODO: /\A[0-9]\Z/ か確認
     if (preg_match('/[0-9]+/', $params['post_id']) == 0) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./comment.log' , "[comment] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->write('post_idは整数のみです');
     }
     $post_id = $params['post_id'];
@@ -427,18 +629,39 @@ $app->post('/comment', function (Request $request, Response $response) {
         $me['id'],
         $params['comment']
     ]);
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./comment.log' , "[comment] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return redirect($response, "/posts/{$post_id}", 302);
 });
 
 $app->get('/admin/banned', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     $me = $this->get('helper')->get_session_user();
 
     if ($me === null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/login', 302);
     }
 
     if ($me['authority'] == 0) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(403)->write('403');
     }
 
@@ -446,23 +669,50 @@ $app->get('/admin/banned', function (Request $request, Response $response) {
     $ps = $db->prepare('SELECT * FROM `users` WHERE `authority` = 0 AND `del_flg` = 0 ORDER BY `created_at` DESC');
     $ps->execute();
     $users = $ps->fetchAll(PDO::FETCH_ASSOC);
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return $this->view->render($response, 'banned.php', ['users' => $users, 'me' => $me]);
 });
 
 $app->post('/admin/banned', function (Request $request, Response $response) {
+    
+    // sumomo::開始時刻
+    $start_time = microtime();    
+    
     $me = $this->get('helper')->get_session_user();
 
     if ($me === null) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return redirect($response, '/login', 302);
     }
 
     if ($me['authority'] == 0) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(403)->write('403');
     }
 
     $params = $request->getParams();
     if ($params['csrf_token'] !== session_id()) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(422)->write('422');
     }
 
@@ -472,17 +722,30 @@ $app->post('/admin/banned', function (Request $request, Response $response) {
         $ps = $db->prepare($query);
         $ps->execute([1, $id]);
     }
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./admin.log' , "[admin] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return redirect($response, '/admin/banned', 302);
 });
 
 $app->get('/@{account_name}', function (Request $request, Response $response, $args) {
 
+    // sumomo::開始時刻
+    $start_time = microtime();
 
     $db = $this->get('db');
     $user = $this->get('helper')->fetch_first('SELECT * FROM `users` WHERE `account_name` = ? AND `del_flg` = 0', $args['account_name']);
 
     if ($user === false) {
+        
+        // sumomo:: 差分時間
+        $time = microtime() - $start_time;
+        // sumomo:: ログ出力
+        file_put_contents('./account.log' , "[account] " . $time . "\n",  FILE_APPEND | LOCK_EX);
+        
         return $response->withStatus(404)->write('404');
     }
 
@@ -505,6 +768,11 @@ $app->get('/@{account_name}', function (Request $request, Response $response, $a
     }
 
     $me = $this->get('helper')->get_session_user();
+    
+    // sumomo:: 差分時間
+    $time = microtime() - $start_time;
+    // sumomo:: ログ出力
+    file_put_contents('./account.log' , "[account] " . $time . "\n",  FILE_APPEND | LOCK_EX);
 
     return $this->view->render($response, 'user.php', ['posts' => $posts, 'user' => $user, 'post_count' => $post_count, 'comment_count' => $comment_count, 'commented_count'=> $commented_count, 'me' => $me]);
 });
