@@ -22,7 +22,7 @@ if (is_file($file)) {
 
 const POSTS_PER_PAGE = 20;
 const UPLOAD_LIMIT = 10 * 1024 * 1024;
-const LOG_DIRECTORY = './log';
+const LOG_DIRECTORY = '/home/isucon/private_isu/webapp/php/log';
 
 $config = [
     'settings' => [
