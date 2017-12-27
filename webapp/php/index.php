@@ -396,7 +396,7 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
     $end_time = time();
     $diff_time = $end_time - $start_time;
     $log_str = '[GET image] [' . $args['id'] . '] 処理時間: ' . $diff_time . 's\n';
-    file_put_contents(LOG_DIRECTORY, $log_str);
+    file_put_contents(LOG_DIRECTORY . '/image.log' , $log_str);
 
     return $response->withStatus(404)->write('404');
 });
