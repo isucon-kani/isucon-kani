@@ -22,6 +22,7 @@ if (is_file($file)) {
 
 const POSTS_PER_PAGE = 20;
 const UPLOAD_LIMIT = 10 * 1024 * 1024;
+const LOG_DIRECTORY = './log';
 
 $config = [
     'settings' => [
@@ -202,7 +203,7 @@ function calculate_passhash($account_name, $password) {
     return digest("{$password}:{$salt}");
 }
 
-// -------- 
+// --------
 
 $app->get('/initialize', function (Request $request, Response $response) {
     $this->get('helper')->db_initialize();
@@ -377,6 +378,8 @@ $app->post('/', function (Request $request, Response $response) {
 });
 
 $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $args) {
+    $satat_time = time();
+
     if ($args['id'] == 0) {
         return '';
     }
@@ -389,6 +392,12 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
         return $response->withHeader('Content-Type', $post['mime'])
                         ->write($post['imgdata']);
     }
+
+    $end_time = time();
+    $diff_time = $end_time - $start_time;
+    $log_str = '[GET image] [' . $args['id'] . '] 処理時間: ' . $diff_time . 's\n';
+    file_put_contents(LOG_DIRECTORY, $log_str);
+
     return $response->withStatus(404)->write('404');
 });
 
@@ -467,6 +476,8 @@ $app->post('/admin/banned', function (Request $request, Response $response) {
 });
 
 $app->get('/@{account_name}', function (Request $request, Response $response, $args) {
+
+
     $db = $this->get('db');
     $user = $this->get('helper')->fetch_first('SELECT * FROM `users` WHERE `account_name` = ? AND `del_flg` = 0', $args['account_name']);
 
