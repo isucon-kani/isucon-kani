@@ -381,14 +381,25 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
         return '';
     }
 
-    $post = $this->get('helper')->fetch_first('SELECT * FROM `posts` WHERE `id` = ?', $args['id']);
+    $memcache = new Memcached();
+    $post_cache = $memcache->get('post_cache/' . $args['id'])
 
-    if (($args['ext'] == 'jpg' && $post['mime'] == 'image/jpeg') ||
-        ($args['ext'] == 'png' && $post['mime'] == 'image/png') ||
-        ($args['ext'] == 'gif' && $post['mime'] == 'image/gif')) {
-        return $response->withHeader('Content-Type', $post['mime'])
-                        ->write($post['imgdata']);
+    if ($post_cache) {
+        return post_data;
+    } else {
+        $post = $this->get('helper')->fetch_first('SELECT * FROM `posts` WHERE `id` = ?', $args['id']);
+
+        if (($args['ext'] == 'jpg' && $post['mime'] == 'image/jpeg') ||
+            ($args['ext'] == 'png' && $post['mime'] == 'image/png') ||
+            ($args['ext'] == 'gif' && $post['mime'] == 'image/gif')) {
+
+            $post_data = $response->withHeader('Content-Type', $post['mime'])
+                ->write($post['imgdata']);
+            $memcache->set('post_cache/' . $args['id'], $post_data);
+            return $post_data;
+        }
     }
+
     return $response->withStatus(404)->write('404');
 });
 
