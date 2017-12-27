@@ -1,15 +1,43 @@
-vendor/
+# laravel
+.env
+/vendor/
+storage/
 
-### Portal
-# Ignore bundler config.
-/portal/.bundle
-/portal/vendor/bundle
+# node modules
+resources/npm-debug.log
+resources/node_modules
+node_modules/
 
-# Ignore the default SQLite database.
-/portal/db/*.sqlite3
-/portal/db/*.sqlite3-journal
+# gitkeep
+!.gitkeep
 
-# Ignore all logfiles and tempfiles.
-/portal/log/*
-!/portal/log/.keep
-/portal/tmp
+#Homestead
+environments/development/homestead/Homestead.yaml
+environments/development/homestead/.vagrant/
+
+# develop tools
+.phpstorm.meta.php
+_ide_helper.php
+
+# Eclipse
+.project
+.classpath
+.settings
+.metadata
+.buildpath
+
+# Idea
+IlluminatedCloud/
+.idea
+*.iml
+*.iws
+*.ipr
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Vim
+*.swp
+*.swo
+
