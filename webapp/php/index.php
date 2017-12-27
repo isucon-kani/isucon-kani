@@ -378,7 +378,7 @@ $app->post('/', function (Request $request, Response $response) {
 });
 
 $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $args) {
-    $start_time = date("Y-m-d H:i:s");
+    $start_time = microtime();
 
     if ($args['id'] == 0) {
         return '';
@@ -389,14 +389,14 @@ $app->get('/image/{id}.{ext}', function (Request $request, Response $response, $
     if (($args['ext'] == 'jpg' && $post['mime'] == 'image/jpeg') ||
         ($args['ext'] == 'png' && $post['mime'] == 'image/png') ||
         ($args['ext'] == 'gif' && $post['mime'] == 'image/gif')) {
+        $time = microtime() - $start_time;
+        file_put_contents('./image.log' , $time . "\n",  FILE_APPEND | LOCK_EX);
         return $response->withHeader('Content-Type', $post['mime'])
                         ->write($post['imgdata']);
     }
 
-    $end_time = date("Y-m-d H:i:s");
-    file_put_contents('./image.log' , $start_time . '\n',  FILE_APPEND | LOCK_EX);
-    file_put_contents('./image.log' , $end_time . '\n',  FILE_APPEND | LOCK_EX);
-
+    $time = microtime() - $start_time;
+    file_put_contents('./image.log' , $time . "\n",  FILE_APPEND | LOCK_EX);
     return $response->withStatus(404)->write('404');
 });
 
